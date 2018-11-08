@@ -118,4 +118,49 @@ int main()
     return 0;
 }
 
+//***************************************************** Atom* gen_atom () *******************************************************
+
+Atom* gen_atom ()
+{
+    Atom *p=new Atom [N];
+    for (int i=0; i< N; i++)
+    {
+        Atom atom;
+        p[i]=atom;
+    }
+    return p;
+}
+
+//************************************************** void init_pos( Atom *p ) ***************************************************
+
+void init_pos( Atom *p )
+{
+    double r=d/N0; // distance between atoms in each direction
+    double n=cbrt(N/2);
+    int counter=0;
+    
+    
+    for (int k=0; k<n; k++)
+    {
+        for (int j=0; j<n;j++)
+        {
+            for (int i=0; i<n; i++)
+            {
+                p[counter].x=i*r;
+                p[counter].y=j*r;                 // first simple cubic lattice
+                p[counter].z=k*r;
+                
+                p[counter + N/2].x=i*r + r/2;
+                p[counter + N/2].y=j*r + r/2;     // second simple cubic lattice
+                p[counter + N/2].z=k*r + r/2;
+                
+                counter++;
+                
+            }
+        }
+    }
+    
+    
+    
+}
 
