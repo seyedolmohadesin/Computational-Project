@@ -32,16 +32,16 @@ double d=pow((N/(rho)),(1.00/3.00)); // length of box in each dimension
 
 //MD settings
 
-int nsteps=100000; // number of steps to run the simulation
+int nsteps=10000; // number of steps to run the simulation
 double dt=0.001; // time element
-int nstxout=100; // number of steps that elapse between writing coordinates and energies to output files
+int nstxout=10; // number of steps that elapse between writing coordinates and energies to output files
 double force_cut=3.5 ; // after this radius the force won't be calulated
 double T=1.2; // initial temperature
 
 // RDF setting
 
-int nstrdf = 100; // number of steps that elapse between writing the RDF outputs
-int rdfpoints= 1000; // Number of data points on RDF plot
+int nstrdf = nsteps; // number of steps that elapse between writing the RDF outputs
+int rdfpoints= 100; // Number of data points on RDF plot
 
 // Energy  variables
 
@@ -102,6 +102,7 @@ void check_boundry (Atom* p, int i);                      // Apllies the periodi
 
 int main()
 {
+    cout << d << endl;
     srand(time(NULL));
     
     Atom *atom_pointer; // defining pointer to store class object's addresses
@@ -250,11 +251,11 @@ void calculate_forces (Atom *p)
         p[i].u=0 ;
     }
     
-    for (int i=0; i<rdfpoints; i++)
+  /*  for (int i=0; i<rdfpoints; i++)
     {
         bin[i] = 0 ;
     }
-    
+    */
     for (int i=0; i<N; i++)
     {
         for (int j=i+1; j<N; j++)
@@ -369,13 +370,19 @@ void MD_run(Atom* p)
     ofstream energies; // file
     ofstream RDFfile ; // RDF file
     
+    for (int i=0; i<rdfpoints; i++)
+        {
+            bin[i] = 0 ;
+        }
+    
+    
     energies.open("/Users/MaedeMohadesin/University/Fall_2018/Computational_Physics/Project/outputs/energies.txt"); // adresses
     trj.open("/Users/MaedeMohadesin/University/Fall_2018/Computational_Physics/Project/outputs/trajectory.xyz"); // to save
     RDFfile.open ("/Users/MaedeMohadesin/University/Fall_2018/Computational_Physics/Project/outputs/RDF.txt"); // the files
     
     energies << "step \t potential energy \t kinetic energy \t total energy \t temperature \n"  ;
     write_trj(trj, p, 1); // first frame
-    RDFfile << "r\tg(r)\n " ;
+    //RDFfile << "r\tg(r)\n " ;
     
     for (int i=0; i<nsteps; i++)
     {
@@ -532,7 +539,7 @@ void MD_run(Atom* p)
         
         // Writting RDF
         
-        if ( (i+1) % nstrdf == 0 || i==0)
+        if ( (i+1) % nstrdf == 0)
         {
             for (int j=0; j<rdfpoints; j++)
             {
@@ -540,8 +547,9 @@ void MD_run(Atom* p)
                 double r = (j+1) * binsize;
                 
                 factor = rho * 4 * 3.14 * r * r * binsize * (N / 2);
-                bin[j] =  bin[j]  / factor ;   // normalizing bin []
+                bin[j] =  bin[j]  / factor / nstrdf ;   // normalizing bin []
                 RDFfile << r << "\t" << bin[j] << "\n";
+                bin[j]=0;
             }
             
             RDFfile << "\n";
